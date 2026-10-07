@@ -9,7 +9,7 @@ def inicio():
 #registro / crear usuario
 @app.route('/crear_usuario')
 def crear_usuario():
-    
+    return ''
 
 #inicio sesión 
 
