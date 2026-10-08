@@ -1,5 +1,11 @@
 #TODAS LAS CLASES IMPORTAN MYSQLCONNECTION
 from flask_app.config.mysqlconnection import connectToMySQL
+import re   # Importamos expresiones regulares
+from flask import flash
+
+# Objeto de expresión regular que usaremos para validar
+
+EMAIL_REGEX = re.compile(r'^[a-zA-Z0-9.+_-]+@[a-zA-Z0-9._-]+.[a-zA-Z]+$')
 
 class Usuario:
 
@@ -57,3 +63,30 @@ class Usuario:
     def delete(cls, datos):
         query = "DELETE FROM usuarios WHERE id = %(id)s;"
         return connectToMySQL('cinepedia').query_db(query, datos)
+
+    #usamos metodo estatico para validar los formularios
+    @staticmethod
+
+    def validar_usuario( usuario ):
+
+       es_valido = True
+       #por cada validacion que yo haga, voy a un if 
+
+       #Revisa si el campo coincide con el patrón
+
+       if not EMAIL_REGEX.match(usuario['email']):
+
+           flash("E-mail inválido")
+
+           es_valido = False
+       if len(usuario['nombre']) < 2:
+            flash("Nombre de usuario necesita al menos 2 caracteres", "usuario")
+            es_valido= False
+       if len(usuario['apellido']) < 2:
+            flash("El apellido del usuario necesita al menos 2 caracteres", "usuario")
+            es_valido= False
+       #falta validacion de contraseña = confirmacion contraseña
+       if not usuario['password'] == usuario['password_conf']:
+           flash('La contraseña no coindice con la confirmacion')
+           es_valido= False
+       return es_valido
