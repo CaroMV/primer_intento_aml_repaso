@@ -64,6 +64,15 @@ class Usuario:
         query = "DELETE FROM usuarios WHERE id = %(id)s;"
         return connectToMySQL('cinepedia').query_db(query, datos)
 
+
+
+    @classmethod
+    def get_by_email(cls, datos):
+        query = "SELECT * FROM usuarios WHERE email=%(email)s"
+        usuario_en_db = connectToMySQL('cinepedia').query_db(query,datos)
+        return cls(usuario_en_db[0])
+        #Si no tenemos respuesta en la base de datos, va a retornar False
+    
     #usamos metodo estatico para validar los formularios
     @staticmethod
 
@@ -89,4 +98,22 @@ class Usuario:
        if not usuario['password'] == usuario['password_conf']:
            flash('La contraseña no coindice con la confirmacion')
            es_valido= False
+
+       if not Usuario.get_by_email({'email':usuario['email']
+                                    }):
+           flash('El correo no se encuentra disponible')
+           es_valido = False
+
        return es_valido
+
+    @staticmethod
+    def validar_login(usuario):
+
+        es_valido= True
+
+        if not Usuario.get_by_email({'email':usuario['email']
+                                    }):
+           flash('El correo no se encuentra en la base datos')
+           es_valido = False
+
+        return es_valido

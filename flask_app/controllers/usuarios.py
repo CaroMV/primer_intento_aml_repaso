@@ -1,7 +1,9 @@
 from flask_app import app
-from flask import render_template, request, redirect, flash
+from flask import render_template, request, redirect, flash, session
 from flask_app.models.usuario import Usuario
+from flask_bcrypt import Bcrypt #Importamos Bcrypt
 
+bcrypt = Bcrypt(app) #Generamos un objeto llamado bcrypt
 
 @app.route('/')
 def inicio(): 
@@ -26,14 +28,22 @@ def crear_usuario():
 
     #--- VALIDACIONES ---
 
+    #Hasheamos la contraseña
+
+    pass_hasheado = bcrypt.generate_password_hash(request.form['password'])
+
     datos_usuario_registro= {
         'nombre': request.form['nombre'],
         'apellido': request.form['apellido'],
         'email': request.form['email'],
-         'password':request.form['password']
+        'password': pass_hasheado
     }
+
+    nuevo_id = Usuario.save(datos_usuario_registro) #Recibiendo el ID del nuevo Usuario
+
+    session['usuario_id'] = nuevo_id
     
-    return ''
+    return redirect('/cine')
 
 #inicio sesión 
 
